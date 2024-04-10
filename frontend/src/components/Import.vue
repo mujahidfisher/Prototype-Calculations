@@ -46,11 +46,11 @@ export default {
   },
   methods: {
     handleFileChange(event) {
-      this.selectedFile = event.target.files[0]; // Update selectedFile with the selected file
+      this.selectedFile = event.target.files[0];
     },
     async uploadFile() {
       if (!this.selectedFile) {
-        alert("Please select a file."); // This alert should only appear if no file is selected
+        alert("Please select a file.");
         return;
       }
 
@@ -58,7 +58,7 @@ export default {
         const formData = new FormData();
         formData.append("file", this.selectedFile);
 
-        const response = await fetch("http://localhost:3000/upload", {
+        const response = await fetch("https://prototype-calculations.onrender.com/upload", {
           method: "POST",
           body: formData
         });
