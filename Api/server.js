@@ -1,34 +1,51 @@
-const express = require('express');
-const multer  = require('multer');
-const xlsx = require('xlsx');
+const express = require("express");
+const multer = require("multer");
+const ExcelJS = require("exceljs");
+const cors = require("cors");
 const PORT = 3000;
 
 const app = express();
-const upload = multer({ dest: 'uploads/' });
-
+const upload = multer({ dest: "uploads/" });
+app.use(cors());
 app.use(express.static("./static"));
 
-app.post('/upload', upload.single('file'), (req, res) => {
-    try {
-        // Check if file exists
-        if (!req.file) {
-            return res.status(400).send('No file uploaded.');
-        }
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header("Access-Control-Allow-Methods", "*");
+  res.header("Access-Control-Request-Methods", "*");
+  res.header("Access-Control-Allow-Headers", "*");
+  res.header("Access-Control-Expose-Headers", "Authorization");
+  next();
+});
 
-        // Read the uploaded file
-        const workbook = xlsx.readFile(req.file.path);
-        const sheetName = workbook.SheetNames[0]; // Assuming only one sheet
-        const worksheet = workbook.Sheets[sheetName];
-        const data = xlsx.utils.sheet_to_json(worksheet);
+app.post("/upload", upload.single("file"), async (req, res) => {
+  try {
 
-        // Send the data back to the frontend
-        res.json(data);
-    } catch (error) {
-        console.error('Error:', error);
-        res.status(500).send('Internal Server Error');
+    if (!req.file) {
+      return res.status(400).send("No file uploaded.");
     }
+
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.readFile(req.file.path);
+    const worksheet = workbook.getWorksheet(1); // Assuming only one sheet
+    const rows = worksheet.getSheetValues();
+
+    const data = rows.map(row => {
+      const rowData = {};
+      row.forEach((cellValue, index) => {
+        rowData[`column_${index + 1}`] = cellValue;
+      });
+      return rowData;
+    });
+
+    res.json(data);
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send("Internal Server Error");
+  }
 });
 
 app.listen(PORT, () => {
-    console.log(`Server is running on ${PORT}🌹`);
+  console.log(`Server is running on ${PORT}🌹`);
 });
