@@ -1,10 +1,11 @@
 const express = require('express');
 const multer  = require('multer');
 const xlsx = require('xlsx');
-const PORT = 3000
+const PORT = 3000;
 
 const app = express();
 const upload = multer({ dest: 'uploads/' });
+
 app.use(express.static("./static"));
 
 app.post('/upload', upload.single('file'), (req, res) => {
