@@ -6,7 +6,7 @@
       <form @submit.prevent="uploadFile">
         <div>
           <label for="file">Choose an XLSX file:</label>
-          <input type="file" id="file" name="file" accept=".xlsx" v-on="selectedFile">
+          <input type="file" id="file" name="file" accept=".xlsx" @change="handleFileChange">
         </div>
         <br>
         <button type="submit">Upload</button>
@@ -45,14 +45,33 @@ export default {
     }
   },
   methods: {
+    handleFileChange(event) {
+      this.selectedFile = event.target.files[0]; // Update selectedFile with the selected file
+    },
     async uploadFile() {
       if (!this.selectedFile) {
-        alert("Please select a file.");
-        console.log("success");
+        alert("Please select a file."); // This alert should only appear if no file is selected
         return;
       }
 
-      this.$store.dispatch('uploadFile', this.selectedFile);
+      try {
+        const formData = new FormData();
+        formData.append("file", this.selectedFile);
+
+        const response = await fetch("http://localhost:3000/upload", {
+          method: "POST",
+          body: formData
+        });
+
+        if (!response.ok) {
+          throw new Error("Upload failed.");
+        }
+
+        const data = await response.json();
+        this.$store.commit("setUploadedData", data);
+      } catch (error) {
+        console.error("Error:", error);
+      }
     }
   }
 }
