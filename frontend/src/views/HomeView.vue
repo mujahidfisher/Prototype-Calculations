@@ -6,11 +6,10 @@
 
 <script>
 import Import from '@/components/Import.vue'
-
 export default {
   name: 'HomeView',
   components: {
-    Import
+    Import,
   }
 }
 </script>

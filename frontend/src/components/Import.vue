@@ -1,3 +1,4 @@
+<!-- Import.vue -->
 <template>
   <div class="hello">
     <h1>Import</h1>
@@ -27,19 +28,51 @@
           </tr>
         </tbody>
       </table>
+      <h2>Results</h2>
+      <div class="results">
+        <WebDeveloperResults :transformedData="transformedData" />
+        <SeoSpecialistResults :transformedData="transformedData" />
+        <CloudResults :transformedData="transformedData" />
+        <DataResults :transformedData="transformedData" />
+        <FlagsResults :transformedData="transformedData" />
+        <NetworkResults :transformedData="transformedData" />
+        <ProjectAdminResults :transformedData="transformedData" />
+        <SecurityAdminResults :transformedData="transformedData" />
+        <SoftwareResults :transformedData="transformedData" />
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import WebDeveloperResults from './WebDevResults.vue';
+import SeoSpecialistResults from './SEOResults.vue'
+import CloudResults from './CloudResults.vue'
+import DataResults from './DataResults.vue'
+import FlagsResults from './FlagsResults.vue'
+import NetworkResults from './NetworkResults.vue'
+import ProjectAdminResults from './ProjectAdminResults.vue'
+import SecurityAdminResults from './SecurityAdminResults.vue'
+import SoftwareResults from './SoftwareResults.vue'
 export default {
   name: 'Import',
   data() {
     return {
       selectedFile: null,
-      headers: ['First Name', 'Last Name', 'Personality Type 1', 'Personality Type 2', 'Personality Type 3', 'Personality Type 4', 'Enneagram', 'Main User Persona', 'Secondary User Persona',],
+      headers: ['First Name', 'Last Name', 'Personality Type 1', 'Personality Type 2', 'Personality Type 3', 'Personality Type 4', 'Enneagram', 'Main User Persona', 'Secondary User Persona'],
       transformedData: []
     };
+  },
+  components: {
+    WebDeveloperResults,
+    SeoSpecialistResults,
+    CloudResults,
+    DataResults,
+    FlagsResults,
+    NetworkResults,
+    ProjectAdminResults,
+    SecurityAdminResults,
+    SoftwareResults
   },
   methods: {
     handleFileChange(event) {
@@ -101,9 +134,14 @@ export default {
         mainUserPersona: row[`column_${mainUpersona + 2}`],
         secondaryUserPersona: row[`column_${secondaryUpersona + 2}`]
       }));
-    }
+    },
   }
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.results {
+  display: flex;
+}
+</style>
+
