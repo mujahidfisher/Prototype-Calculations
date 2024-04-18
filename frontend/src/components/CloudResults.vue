@@ -3,6 +3,7 @@
         <table>
             <thead>
                 <tr>
+                    <th>ID</th>
                     <th>
                         <h3>Cloud Practitioner</h3>
                     </th>
@@ -10,6 +11,7 @@
             </thead>
             <tbody>
                 <tr v-for="(row, index) in transformedData" :key="index">
+                    <td>{{ row.id }}</td>
                     <td>{{ cloudResults(row) }}%</td>
                 </tr>
             </tbody>

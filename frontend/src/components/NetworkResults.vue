@@ -3,6 +3,7 @@
         <table>
             <thead>
                 <tr>
+                    <th>ID</th>
                     <th>
                         <h3>Network and Support Technician</h3>
                     </th>
@@ -10,6 +11,7 @@
             </thead>
             <tbody>
                 <tr v-for="(row, index) in transformedData" :key="index">
+                    <td>{{ row.id }}</td>
                     <td>{{ networkResults(row) }}%</td>
                 </tr>
             </tbody>

@@ -14,11 +14,19 @@
       </form>
     </div>
 
+    <div>
+      <label for="filter-id">Filter by ID:</label>
+      <input type="number" id="filter-id" v-model="filterId">
+      <button @click="applyFilter">Double click Filter</button>
+    </div>
+    <button @click="clearLocalStorage">clear save data</button>
+
     <div id="data-container" v-if="transformedData.length > 0">
       <h2>Uploaded Data</h2>
       <table>
         <thead>
           <tr>
+            <th>ID</th>
             <th v-for="(header, index) in headers" :key="index">{{ header }}</th>
           </tr>
         </thead>
@@ -29,20 +37,23 @@
         </tbody>
       </table>
       <h2>Results</h2>
-      <div class="results">
-        <WebDeveloperResults :transformedData="transformedData" />
-        <SeoSpecialistResults :transformedData="transformedData" />
-        <CloudResults :transformedData="transformedData" />
-        <DataResults :transformedData="transformedData" />
-        <FlagsResults :transformedData="transformedData" />
-        <NetworkResults :transformedData="transformedData" />
-        <ProjectAdminResults :transformedData="transformedData" />
-        <SecurityAdminResults :transformedData="transformedData" />
-        <SoftwareResults :transformedData="transformedData" />
+      <div class="table-responsive-xxl">
+        <table class="table table-striped">
+          <WebDeveloperResults :transformedData="transformedData" />
+          <SeoSpecialistResults :transformedData="transformedData" />
+          <CloudResults :transformedData="transformedData" />
+          <DataResults :transformedData="transformedData" />
+          <FlagsResults :transformedData="transformedData" />
+          <NetworkResults :transformedData="transformedData" />
+          <ProjectAdminResults :transformedData="transformedData" />
+          <SecurityAdminResults :transformedData="transformedData" />
+          <SoftwareResults :transformedData="transformedData" />
+        </table>
       </div>
     </div>
   </div>
 </template>
+
 
 <script>
 import WebDeveloperResults from './WebDevResults.vue';
@@ -60,7 +71,8 @@ export default {
     return {
       selectedFile: null,
       headers: ['First Name', 'Last Name', 'Personality Type 1', 'Personality Type 2', 'Personality Type 3', 'Personality Type 4', 'Enneagram', 'Main User Persona', 'Secondary User Persona'],
-      transformedData: []
+      transformedData: [],
+      filterId: null
     };
   },
   components: {
@@ -77,6 +89,15 @@ export default {
   methods: {
     handleFileChange(event) {
       this.selectedFile = event.target.files[0];
+    },
+    loadFromLocalStorage() {
+      const savedData = localStorage.getItem('importedData');
+      if (savedData) {
+        this.transformedData = JSON.parse(savedData);
+      }
+    },
+    saveToLocalStorage() {
+      localStorage.setItem('importedData', JSON.stringify(this.transformedData));
     },
     async uploadFile() {
       if (!this.selectedFile) {
@@ -101,6 +122,7 @@ export default {
         console.log('Excel Data:', excelData);
         if (Array.isArray(excelData)) {
           this.transformedData = this.transformExcelData(excelData);
+          this.saveToLocalStorage();
           console.log('Transformed Data:', this.transformedData);
         } else {
           throw new Error("Invalid data received from server.");
@@ -123,7 +145,8 @@ export default {
       const enneagramIndex = Object.values(headersRow).findIndex(header => header === 'enneagram');
       const mainUpersona = Object.values(headersRow).findIndex(header => header === 'mainUserPersona');
       const secondaryUpersona = Object.values(headersRow).findIndex(header => header === 'secondaryUserPersona');
-      return data.slice(2).map(row => ({
+      return data.slice(2).map((row, index) => ({
+        id: index + 1,
         firstName: row[`column_${firstNameIndex + 2}`],
         lastName: row[`column_${lastNameIndex + 2}`],
         personalityType1: row[`column_${Ptype1Index + 2}`],
@@ -135,13 +158,29 @@ export default {
         secondaryUserPersona: row[`column_${secondaryUpersona + 2}`]
       }));
     },
+    applyFilter() {
+      if (!this.filterId) {
+        this.loadFromLocalStorage();
+        return;
+      }
+      if (this.transformedData.length === 0) {
+        this.loadFromLocalStorage();
+      }
+      this.transformedData = this.transformedData.filter(row => row.id === parseInt(this.filterId));
+    },
+    mounted() {
+      this.loadFromLocalStorage();
+    },
+    clearLocalStorage() {
+      localStorage.removeItem('importedData');
+      this.transformedData = []; 
+    },
   }
 }
 </script>
 
 <style scoped>
-.results {
-  display: flex;
+.table {
+  width: 100% !important;
 }
 </style>
-
